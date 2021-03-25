@@ -5,11 +5,29 @@ $ErrorActionPreference = 'SilentlyContinue'
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Output "This script needs to be run as Admin. If you want to run this as admin, press 'y', otherwise press 'n' to quit! "
     if ($( Read-Host -Prompt "Do you want to re-run this script as admin? (y/n)") -eq 'y') {
+        Start-Process PowerShell -Verb RunAs "-NoProfile -ExecutionPolicy Bypass -Command `"cd '$pwd'; & '$PSCommandPath';`"";
         exit;
     }
-    Start-Process PowerShell -Verb RunAs "-NoProfile -ExecutionPolicy Bypass -Command `"cd '$pwd'; & '$PSCommandPath';`"";
-    exit;
+    else {
+        exit;
+    }
 }
+
+
+param (
+    [Parameter(ValueFromPipeline = $true)][switch]$RemoveApps,
+    [Parameter(ValueFromPipeline = $true)][switch]$RemoveApps,
+    [Parameter(ValueFromPipeline = $true)][switch]$InstallChoco,
+    [Parameter(ValueFromPipeline = $true)][switch]$InstallAllApps,
+    [Parameter(ValueFromPipeline = $true)][switch]$ApplyShutup10,
+    [Parameter(ValueFromPipeline = $true)][switch]$DisableOnedrive,
+    [Parameter(ValueFromPipeline = $true)][switch]$DisableCortana,
+    [Parameter(ValueFromPipeline = $true)][switch]$EnableDarkMode,
+    [Parameter(ValueFromPipeline = $true)][switch]$TweakSecurity,
+    [Parameter(ValueFromPipeline = $true)][switch]$DisableBackgroundApps,
+    [Parameter(ValueFromPipeline = $true)][switch]$DisableHibernation,
+    [Parameter(ValueFromPipeline = $true)][switch]$TweakMisc
+)
 
 # This function stores a list of apps to remove in "apps" then goes through the list and tries to remove each
 function RemoveApps {
@@ -94,19 +112,6 @@ function RemoveApps {
 } # End function RemoveApps
 
 
-# Function that takes in a message to display on screen and registry path to apply changes to the registry
-function RegImport {
-    param 
-    (
-        $Message,
-        $Path
-    )
-
-    Write-Output $Message
-    reg import $path
-}
-
-
 Clear-Host
 Write-Output " Choose if you want to run all functions in the script or choose what to for each step."
 Write-Output " Option (1) includes all apps I use installed via Chocolatey which might take a long time."
@@ -127,12 +132,32 @@ Enable-ComputerRestore -Drive "C:\"
 Checkpoint-Computer -Description "Win10Setup" -RestorePointType "MODIFY_SETTINGS"
 
 if ($Mode -eq '1') {
-
+    $PSBoundParameters.Add('RemoveApps', $RemoveApps)
+    $PSBoundParameters.Add('InstallChoco', $InstallChoco)
+    $PSBoundParameters.Add('InstallAllApps', $InstallAllApps)
+    $PSBoundParameters.Add('ApplyShutup10', $ApplyShutup10)
+    $PSBoundParameters.Add('UninstallOnedrive', $DisableOnedrive)
+    $PSBoundParameters.Add('DisableCortana', $DisableCortana)
+    $PSBoundParameters.Add('EnableDarkMode', $EnableDarkMode)
+    $PSBoundParameters.Add('TweakSecurity', $TweakSecurity)
+    $PSBoundParameters.Add('DisableBackgroundApps', $DisableBackgroundApps)
+    $PSBoundParameters.Add('DisableHibernation', $DisableHibernation)
+    $PSBoundParameters.Add('TweakMisc', $TweakMisc)
 }
 elseif ($Mode -eq '2') {
-    
+    # Same as 1 but skips apps installation
+    $PSBoundParameters.Add('RemoveApps', $RemoveApps)
+    $PSBoundParameters.Add('ApplyShutup10', $ApplyShutup10)
+    $PSBoundParameters.Add('UninstallOnedrive', $DisableOnedrive)
+    $PSBoundParameters.Add('DisableCortana', $DisableCortana)
+    $PSBoundParameters.Add('EnableDarkMode', $EnableDarkMode)
+    $PSBoundParameters.Add('TweakSecurity', $TweakSecurity)
+    $PSBoundParameters.Add('DisableBackgroundApps', $DisableBackgroundApps)
+    $PSBoundParameters.Add('DisableHibernation', $DisableHibernation)
+    $PSBoundParameters.Add('TweakMisc', $TweakMisc)
 }
 elseif ($Mode -eq '3') {
+    # Let the user pick everything
     if ($( Read-Host -Prompt "Remove pre-installed apps (y/n)" ) -eq 'y') {
         $PSBoundParameters.Add('RemoveApps', $RemoveApps)   
     }
@@ -239,19 +264,7 @@ switch ($PSBoundParameters.Keys) {
         }
         Remove-Item -Path "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
         Remove-Item -Path "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" -Recurse -ErrorAction SilentlyContinue
-        $wshell.Popup("Operation Completed", 0, "Done", 0x0)
-    }
-    'DisableLockscreenTips' {
-        RegImport "> Disabling tips & tricks on the lockscreen..." $PSScriptRoot\Regfiles\Disable_Lockscreen_Tips.reg
-    }
-    'DisableIncludeInLibrary' {
-        RegImport "> Disabling 'Include in library' in the context menu..." $PSScriptRoot\Regfiles\Disable_Include_in_library_from_context_menu.reg
-    }
-    'DisableGiveAccessTo' {
-        RegImport "> Disabling 'Give access to' in the context menu..." $PSScriptRoot\Regfiles\Disable_Give_access_to_context_menu.reg
-    }
-    'DisableShare' {
-        RegImport "> Disabling 'Share' in the context menu..." $PSScriptRoot\Regfiles\Disable_Share_from_context_menu.reg
+        Write-Host "Done disabling OneDrive"
     }
     'EnableDarkMode' {
         Write-Host "Enabling Dark Mode"
