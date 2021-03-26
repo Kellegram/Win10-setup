@@ -3,7 +3,14 @@ $ErrorActionPreference = 'SilentlyContinue'
 
 # If not run as admin, ask if user wants to run as admin or quit.
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Output "This script needs to be run as Admin. If you want to run this as admin, press 'y', otherwise press 'n' to quit! "
+    if ($( Read-Host -Prompt "Do you want to re-run this script as admin? (y/n)") -eq 'y') {
         Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+        exit;
+    }
+    else {
+        exit;
+    }
 }
 
 
@@ -113,11 +120,17 @@ Write-Output "------------------------------------------------------------------
 Write-Output "(1) Run everything"
 Write-Output "(2) Re-run with exceptions (Skips installing apps for example)"
 Write-Output "(3) Configure manually (recommended)"
+Write-Output "(4) Cancel script"
 Write-Output ""
 
 # Wait for user choice
-Do { $Mode = Read-Host "Please select a valid option (1/2)" }
-while ($Mode -ne '1' -and $Mode -ne '2' -and $Mode -ne '3')
+Do { $Mode = Read-Host "Please select a valid option (1-4)" }
+while ($Mode -ne '1' -and $Mode -ne '2' -and $Mode -ne '3' -and $Mode -ne '4')
+
+if ($Mode -eq '4')
+{
+    break;
+}
 
 # Create a restore point 
 Write-Host "Creating System Restore Point"
