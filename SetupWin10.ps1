@@ -1,6 +1,3 @@
-# Hide most errors and continue
-$ErrorActionPreference = 'SilentlyContinue'
-
 # If not run as admin, ask if user wants to run as admin or quit.
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Output "This script needs to be run as Admin. If you want to run this as admin, press 'y', otherwise press 'n' to quit! "
@@ -12,6 +9,9 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
         exit;
     }
 }
+
+# Hide most errors and continue
+$ErrorActionPreference = 'SilentlyContinue'
 
 param (
     [Parameter(ValueFromPipeline = $true)][switch]$RemoveApps,
