@@ -5,7 +5,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Output "This script needs to be run as Admin. If you want to run this as admin, press 'y', otherwise press 'n' to quit! "
     if ($( Read-Host -Prompt "Do you want to re-run this script as admin? (y/n)") -eq 'y') {
-        Start-Process PowerShell.exe -ArgumentList ("-NoExit -NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+        Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
         exit;
     }
     else {
