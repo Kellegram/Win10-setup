@@ -162,10 +162,12 @@ elseif ($Mode -eq '2') {
 }
 elseif ($Mode -eq '3') {
     # Let the user pick everything
+    Write-Output ""
     if ($( Read-Host -Prompt "Remove pre-installed apps (y/n)" ) -eq 'y') {
         $PSBoundParameters.Add('RemoveApps', $RemoveApps)   
     }
 
+    Write-Output ""
     Write-Output " If you do not install Chocolatey package manager, a lot of the options will be unavailable."
     if ($( Read-Host -Prompt "Install Chocolatey package manager? (y/n)") -eq 'y') {
         $PSBoundParameters.Add('InstallChoco', $InstallChoco)
@@ -179,30 +181,37 @@ elseif ($Mode -eq '3') {
         }
     }
 
+    Write-Output ""
     if ($( Read-Host -Prompt "Disable OneDrive (y/n)" ) -eq 'y') {
         $PSBoundParameters.Add('UninstallOnedrive', $DisableOnedrive)   
     }
 
+    Write-Output ""
     if ($(Read-Host -Prompt "Disable Cortana (y/n)") -eq 'y') {
         $PSBoundParameters.Add('DisableCortana', $DisableCortana)
     }
 
+    Write-Output ""
     if ($( Read-Host -Prompt "Enable Windows 10 dark mode (y/n)") -eq 'y') {
         $PSBoundParameters.Add('EnableDarkMode', $EnableDarkMode)
     }
 
+    Write-Output ""
     if ($( Read-Host -Prompt "Enable/enforce some security tweaks (y/n)") -eq 'y') {
         $PSBoundParameters.Add('TweakSecurity', $TweakSecurity)
     }
 
+    Write-Output ""
     if ($( Read-Host -Prompt "Disable background application access (y/n)")) {
         $PSBoundParameters.Add('DisableBackgroundApps', $DisableBackgroundApps)
     }
 
+    Write-Output ""
     if ($( Read-Host -Prompt "Disable hibernation (y/n)") -eq 'y') {
         $PSBoundParameters.Add('DisableHibernation', $DisableHibernation)
     }
 
+    Write-Output ""
     Write-Host "Misc. tweaks are listed on my website (https://kellegram.xyz) as well as on my repository"
     if ($( Read-Host -Prompt "Perform other misc. tweaks (y/n)") -eq 'y') {
         $PSBoundParameters.Add('TweakMisc', $TweakMisc)
@@ -211,6 +220,7 @@ elseif ($Mode -eq '3') {
 }
 else { 
     # This should never happen
+    Write-Output "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     Write-Output " You shouldn't be seeing this message :o"
     Write-Output " Try running the script again in a new window and make sure to follow instructions correctly."
     Write-Output " If it fails again, leave an issue in the repository and make sure to provide the error: "
@@ -219,22 +229,34 @@ else {
     $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
+Clear-Host
+Write-Output "Beginning selected operation/s"
+Start-Sleep -s 1
+Write-Output "..."
+Start-Sleep -s 1
+
 switch ($PSBoundParameters.Keys) {
     'RemoveApps' {
+        Write-Output "--------------------------------------------------------------"
+        Write-Output "Removing apps"
         RemoveApps
+        Write-Output "Done removing apps"
     }
     'InstallChoco' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Installing Chocolatey"
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
         choco install chocolatey-core.extension -y
         Write-Host "Done installing Chocolatey"
     }
     'InstallAllApps' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Beginning installation of apps via Chocolatey"
         choco install firefox 7zip.install notepadplusplus.install vlc vcredist140 git.install openssh autohotkey.portable teamviewer gimp vscode inkscape treesizefree winscp.install chocolateygui wireshark sumatrapdf.install irfanview microsoft-windows-terminal audacity everything qbittorrent steam tor-browser rufus cpu-z.install telegram.install etcher blender foobar2000 kitty discord handbrake sharex freefilesync obs-studio hwinfo teracopy powertoys -y
         Write-Host "Done installing apps"
     }
     'ApplyShutup10' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Running O&O Shutup with Recommended Settings"
         Import-Module BitsTransfer
         Start-BitsTransfer -Source "https://raw.githubusercontent.com/Kellegram/Win10-setup/master/ooshutup10.cfg" -Destination ooshutup10.cfg
@@ -243,6 +265,7 @@ switch ($PSBoundParameters.Keys) {
         Write-Host "Done running Shutup10"
     }
     'UninstallOnedrive' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Disabling OneDrive..."
         If (!(Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive")) {
             New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" | Out-Null
@@ -271,11 +294,13 @@ switch ($PSBoundParameters.Keys) {
         Write-Host "Done disabling OneDrive"
     }
     'EnableDarkMode' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Enabling Dark Mode"
         Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
         Write-Host "Done enabling Dark Mode"
     }
     'TweakSecurity' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Beginning security tweaks"
 
         Write-Host "Disabling SMB 1.0 protocol..."
@@ -285,6 +310,7 @@ switch ($PSBoundParameters.Keys) {
 
     }
     'DisableCortana' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Disabling Cortana..."
         If (!(Test-Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings")) {
             New-Item -Path "HKCU:\SOFTWARE\Microsoft\Personalization\Settings" -Force | Out-Null
@@ -306,6 +332,7 @@ switch ($PSBoundParameters.Keys) {
         Write-Host "Done disabling Cortana"
     }
     'DisableBackgroundApps' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Disabling Background application access..."
         Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach-Object {
             Set-ItemProperty -Path $_.PsPath -Name "Disabled" -Type DWord -Value 1
@@ -314,6 +341,7 @@ switch ($PSBoundParameters.Keys) {
         Write-Host "Done disabling background apps"
     }
     'TweakMisc' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Beginning misc. tweaks..."
         Write-Host "Disabling Bing Search in Start Menu..."
         Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Type DWord -Value 0
@@ -482,19 +510,23 @@ switch ($PSBoundParameters.Keys) {
 
     }
     'DisableHibernation' {
+        Write-Output "--------------------------------------------------------------"
         Write-Host "Disabling Hibernation..."
         Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernteEnabled" -Type Dword -Value 0
         If (!(Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings")) {
             New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" | Out-Null
         }
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" -Name "ShowHibernateOption" -Type Dword -Value 0
+        Write-Output "Done disabling hibernation"
     }
 
 }
 
 
-
+Write-Output "--------------------------------------------------------------"
 Write-Output "All tasks in the script have run. Some changes require a PC restart."
 Write-Output "It is highly recommended to restart now, before making any other changes to the sytem!"
 Write-Output "Press any key to close..."
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
+
