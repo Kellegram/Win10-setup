@@ -168,7 +168,7 @@ elseif ($Mode -eq '3') {
     }
 
     Write-Output ""
-    Write-Output " If you do not install Chocolatey package manager, a lot of the options will be unavailable."
+    Write-Output ">>>If you do not install Chocolatey package manager, a lot of the options will be unavailable.<<<"
     if ($( Read-Host -Prompt "Install Chocolatey package manager? (y/n)") -eq 'y') {
         $PSBoundParameters.Add('InstallChoco', $InstallChoco)
 
