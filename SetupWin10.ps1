@@ -3,14 +3,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 
 # If not run as admin, ask if user wants to run as admin or quit.
 if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Output "This script needs to be run as Admin. If you want to run this as admin, press 'y', otherwise press 'n' to quit! "
-    if ($( Read-Host -Prompt "Do you want to re-run this script as admin? (y/n)") -eq 'y') {
         Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
         Exit
-    }
-    else {
-        Break
-    }
 }
 
 
@@ -221,7 +215,7 @@ switch ($PSBoundParameters.Keys) {
     }
     'InstallChoco' {
         Write-Host "Installing Chocolatey"
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
         choco install chocolatey-core.extension -y
         Write-Host "Done installing Chocolatey"
     }
@@ -303,7 +297,7 @@ switch ($PSBoundParameters.Keys) {
     }
     'DisableBackgroundApps' {
         Write-Host "Disabling Background application access..."
-        Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach {
+        Get-ChildItem -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Exclude "Microsoft.Windows.Cortana*" | ForEach-Object {
             Set-ItemProperty -Path $_.PsPath -Name "Disabled" -Type DWord -Value 1
             Set-ItemProperty -Path $_.PsPath -Name "DisabledByUser" -Type DWord -Value 1
         }
