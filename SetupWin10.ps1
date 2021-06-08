@@ -473,10 +473,6 @@ switch ($PSBoundParameters.Keys) {
         Write-Host "Disabling Storage Sense..."
         Remove-Item -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" -Recurse -ErrorAction SilentlyContinue
 
-        Write-Host "Stopping and disabling Superfetch service..."
-        Stop-Service "SysMain" -WarningAction SilentlyContinue
-        Set-Service "SysMain" -StartupType Disabled
-
         Write-Host "Setting BIOS time to UTC..."
         Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Type DWord -Value 1
 
