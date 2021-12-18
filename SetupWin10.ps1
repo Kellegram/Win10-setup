@@ -223,8 +223,7 @@ else {
     Write-Output "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     Write-Output " You shouldn't be seeing this message :o"
     Write-Output " Try running the script again in a new window and make sure to follow instructions correctly."
-    Write-Output " If it fails again, leave an issue in the repository and make sure to provide the error: "
-    Write-Output " Error: Failed during multiple choice 01."
+    Write-Output " If it fails again, leave an issue in the repository and make sure to provide the error "
     Write-Output " Press any key to continue..."
     $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
